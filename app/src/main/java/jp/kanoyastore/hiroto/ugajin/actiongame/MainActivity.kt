@@ -2,10 +2,16 @@ package jp.kanoyastore.hiroto.ugajin.actiongame
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.View
+import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
 import android.widget.FrameLayout
 import jp.kanoyastore.hiroto.ugajin.actiongame.databinding.ActivityMainBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -17,6 +23,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater) // 追加
         val view = binding.root // 追加
         setContentView(view) // 変更
+
+        val frameLayout = binding.frameLayout
 
         val squareView = binding.squareView
 
@@ -31,16 +39,19 @@ class MainActivity : AppCompatActivity() {
         val button5 = binding.button5
         val button6 = binding.button6
 
-
-
-
+        val displayMetrics = DisplayMetrics()
+//        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val screenWidth = displayMetrics.widthPixels
 
 
 // 画面上の座標をピクセル単位で指定
         val xPosition = 200 // x座標
         val yPosition = 300 // y座標
 // LayoutParamsオブジェクトを作成し、位置情報を設定
-        val layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+        val layoutParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+        )
         layoutParams.leftMargin = xPosition
         layoutParams.topMargin = yPosition
 // ImageViewにLayoutParamsを設定
@@ -86,29 +97,34 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
-
-
-
-
-
         val random = Random()
 
-        val animation = TranslateAnimation(0f, 0f, 0f, 1600f)
+        val animation = TranslateAnimation(0f, 0f, 0f, 1000f)
         animation.duration = 3000
         animation.fillAfter = true
-        squareView.animation = animation
 
-        val number = random.nextInt(100)
-        squareView.text = number.toString()
+        animation.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {
+                // アニメーションが開始されたときの処理
+                val number = random.nextInt(100)
+                squareView.text = number.toString()
+            }
 
-        squareView.visibility = View.VISIBLE
-        animation.start()
+            override fun onAnimationEnd(animation: Animation?) {
+                // アニメーションが終了したときの処理
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(3000)
+                    squareView.startAnimation(animation)
+                }
+            }
+
+            override fun onAnimationRepeat(animation: Animation?) {
+                // アニメーションが繰り返されたときの処理
+
+            }
+        })
+
+        squareView.startAnimation(animation)
+
     }
-
-
-
-
-
-
 }
