@@ -40,9 +40,7 @@ class MainActivity : AppCompatActivity() {
         val button6 = binding.button6
 
         val displayMetrics = DisplayMetrics()
-//        windowManager.defaultDisplay.getMetrics(displayMetrics)
         val screenWidth = displayMetrics.widthPixels
-
 
 // 画面上の座標をピクセル単位で指定
         val xPosition = 200 // x座標
@@ -99,32 +97,30 @@ class MainActivity : AppCompatActivity() {
 
         val random = Random()
 
-        val animation = TranslateAnimation(0f, 0f, 0f, 1000f)
-        animation.duration = 3000
-        animation.fillAfter = true
+        var animation1 = TranslateAnimation(200f, 200f, 0f, 1600f)
+        animation1.duration = 2800
+        animation1.fillAfter = true
 
-        animation.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation?) {
-                // アニメーションが開始されたときの処理
-                val number = random.nextInt(100)
-                squareView.text = number.toString()
+        var animation2 = TranslateAnimation(500f, 500f, 0f, 1600f)
+        animation2.duration = 2800
+        animation2.fillAfter = true
+
+        var animation3 = TranslateAnimation(800f, 800f, 0f, 1600f)
+        animation3.duration = 2800
+        animation3.fillAfter = true
+
+        val animations = listOf(animation1, animation2, animation3)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            var counter = 0
+            while (counter < 10) {
+                val randomAnimation = animations.random()
+                val randomNumber = random.nextInt(100)
+                squareView.text = randomNumber.toString()
+                squareView.startAnimation(randomAnimation)
+                delay(3000)
+                counter++
             }
-
-            override fun onAnimationEnd(animation: Animation?) {
-                // アニメーションが終了したときの処理
-                CoroutineScope(Dispatchers.Main).launch {
-                    delay(3000)
-                    squareView.startAnimation(animation)
-                }
-            }
-
-            override fun onAnimationRepeat(animation: Animation?) {
-                // アニメーションが繰り返されたときの処理
-
-            }
-        })
-
-        squareView.startAnimation(animation)
-
+        }
     }
 }
